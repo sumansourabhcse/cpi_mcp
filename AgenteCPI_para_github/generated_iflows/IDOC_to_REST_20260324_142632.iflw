@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:ifl="http://sap.com/xi/ESBuildingBlock" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://sap.com/xi/ESBuildingBlock">
+    <bpmn2:collaboration id="Collaboration_1">
+        <bpmn2:participant id="Participant_1" ifl:type="EndpointSender" name="SOAP_Sender" processRef="Process_1">
+            <bpmn2:extensionElements>
+                <ifl:property name="address" value="/IDOC_to_REST"/>
+                <ifl:property name="adapterType" value="SOAP"/>
+                <ifl:property name="protocol" value="SOAP 1.2"/>
+                <ifl:property name="authenticationType" value="BasicAuthentication"/>
+                <ifl:property name="namespaceUri" value="{{SOAP_NAMESPACE_URI}}"/>
+            </bpmn2:extensionElements>
+        </bpmn2:participant>
+        <bpmn2:participant id="Participant_2" ifl:type="EndpointReceiver" name="HTTP_Receiver" processRef="Process_2">
+            <bpmn2:extensionElements>
+                <ifl:property name="address" value="{{RECEIVER_HTTP_URL}}"/>
+                <ifl:property name="adapterType" value="HTTP"/>
+                <ifl:property name="httpMethod" value="POST"/>
+                <ifl:property name="contentType" value="application/json"/>
+                <ifl:property name="authenticationType" value="{{HTTP_AUTH_TYPE}}"/>
+                <ifl:property name="timeout" value="{{HTTP_TIMEOUT}}"/>
+            </bpmn2:extensionElements>
+        </bpmn2:participant>
+        <bpmn2:messageFlow id="MessageFlow_1" sourceRef="EndEvent_2" targetRef="Participant_1"/>
+        <bpmn2:messageFlow id="MessageFlow_2" sourceRef="ServiceTask_5" targetRef="Participant_2"/>
+        <bpmn2:messageFlow id="MessageFlow_3" sourceRef="Participant_2" targetRef="EndEvent_3"/>
+    </bpmn2:collaboration>
+    <bpmn2:process id="Process_1" name="IDOC_to_REST Process">
+        <bpmn2:startEvent id="StartEvent_1" name="Start">
+            <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
+        </bpmn2:startEvent>
+        <bpmn2:scriptTask id="ScriptTask_1" name="Validate IDOC Structure" scriptFormat="groovy">
+            <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
+            <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
+            <bpmn2:script><![CDATA[import com.sap.gateway.ip.core.customdev.util.Message
+import groovy.xml.XmlSlurper
+
+def Message processData(Message message) {
+    def body = message.getBody(String.class)
+    def messageLog = messageLogFactory.getMessageLog(message)
+    
+    try {
+        def idoc = new XmlSlurper().parseText(body)
+        
+        // Validate IDOC structure exists
+        if (!idoc) {
+            throw new Exception("IDOC XML structure is empty or invalid")
+        }
+        
+        // Log IDOC type
+        messageLog.addAttachmentAsString("Original_IDOC", body, "text/xml")
+        messageLog.setStringProperty("IDOC_Type", idoc.name())
+        
+        // Validate mandatory fields (example - adjust based on your IDOC type)
+        if (!idoc.EDI_DC40) {
+            throw new Exception("Missing EDI_DC40 control record")
+        }
+        
+        messageLog.setStringProperty("ValidationStatus", "SUCCESS")
+        message.setBody(body)
+        
+    } catch (Exception e) {
+        messageLog.setStringProperty("ValidationStatus", "FAILED")
+        messageLog.setStringProperty("ValidationError", e.getMessage())
+        throw new Exception("IDOC Validation Failed: " + e.getMessage())
+    }
+    
+    return message
+}]]></bpmn2:script>
+        </bpmn2:scriptTask>
+        <bpmn2:callActivity id="CallActivity_1" name="Message Mapping IDOC to JSON">
+            <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
+            <bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing>
+            <bpmn2:extensionElements>
+                <ifl:property name="mappingType" value="MessageMapping"/>
+                <ifl:property name="mappingName" value="IDOC_to_JSON_Mapping"/>
+            </bpmn2:extensionElements>
+        </bpmn2:callActivity>
+        <bpmn2:scriptTask id="ScriptTask_2" name="Enrich and Transform JSON" scriptFormat="groovy">
+            <bpmn2:incoming>SequenceFlow_3</bpmn2:incoming>
+            <bpmn2:outgoing>SequenceFlow_4</bpmn2:outgoing>
+            <bpmn2:script><![CDATA[import com.sap.gateway.ip.core.customdev.util.Message
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+import java.text.SimpleDateFormat
+
+def Message processData(Message message) {
+    def body = message.getBody(String.class)
+    def messageLog = messageLogFactory.getMessageLog(message)
+    
+    try {
+        def jsonSlurper = new JsonSlurper()
+        def jsonPayload = jsonSlurper.parseText(body)
+        
+        // Add timestamp
+        def sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"))
+        jsonPayload.processedTimestamp = sdf.format(new Date())
+        
+        // Add correlation ID if not exists
+        if (!jsonPayload.correlationId) {
+            def headers = message.getHeaders()
+            jsonPayload.correlationId = headers.get("SAP_MessageProcessingLogID") ?: UUID.randomUUID().toString()
+        }
+        
+        // Transform date fields (example: convert YYYYMMDD to ISO format)
+        if (jsonPayload.date && jsonPayload.date ==~ /^\d{8}$/) {
+            def dateStr = jsonPayload.date
+            def year = dateStr.substring(0, 4)
+            def month = dateStr.substring(4, 6)
+            def day = dateStr.substring(6, 8)
+            jsonPayload.date = "${year}-${month}-${day}"
+        }
+        
+        // Convert decimal strings to numbers if needed
+        jsonPayload.each { key, value ->
+            if (value instanceof String && value.isNumber()) {
+                if (value.contains('.')) {
+                    jsonPayload[key] = value.toDouble()
+                } else {
+                    jsonPayload[key] = value.toLong()
+                }
+            }
+        }
+        
+        def enrichedJson = JsonOutput.toJson(jsonPayload)
+        messageLog.addAttachmentAsString("Enriched_JSON", enrichedJson, "application/json")
+        
+        message.setBody(enrichedJson)
+        message.setHeader("Content-Type", "application/json")
+        
+    } catch (Exception e) {
+        messageLog.setStringProperty("EnrichmentError", e.getMessage())
+        throw new Exception("JSON Enrichment Failed: " + e.getMessage())
+    }
+    
+    return message
+}]]></bpmn2:script>
+        </bpmn2:scriptTask>
+        <bpmn2:scriptTask id="ScriptTask_3" name="Set HTTP Headers" scriptFormat="groovy">
+            <bpmn2:incoming>SequenceFlow_4</bpmn2:incoming>
+            <bpmn2:outgoing>SequenceFlow_5</bpmn2:outgoing>
+            <bpmn2:script><![CDATA[import com.sap.gateway.ip.core.customdev.util.Message
+
+def Message processData(Message message) {
+    def headers = message.getHeaders()
+    def properties = message.getProperties()
+    
+    // Set standard headers
+    message.setHeader("Content-Type", "application/json")
+    message.setHeader("Accept", "application/json")
+    
+    // Set correlation ID for tracing
+    def correlationId = properties.get("SAP_MessageProcessingLogID") ?: UUID.randomUUID().toString()
+    message.setHeader("X-Correlation-ID", correlationId)
+    
+    // Set custom headers if needed
+    message.setHeader("X-Source-System", "SAP_ECC")
+    message.setHeader("X-Integration-Type", "IDOC_to_REST")
+    
+    return message
+}]]></bpmn2:script>
+        </bpmn2:scriptTask>
+        <bpmn2:serviceTask id="ServiceTask_5" name="Send to HTTP Endpoint">
+            <bpmn2:incoming>SequenceFlow_5</bpmn2:incoming>
+            <bpmn2:outgoing>SequenceFlow_6</bpmn2:outgoing>
+        </bpmn2:serviceTask>
+        <bpmn2:scriptTask id="ScriptTask_4" name="Log Success" scriptFormat="groovy">
+            <bpmn2:incoming>SequenceFlow_6</bpmn2:incoming>
+            <bpmn2:outgoing>SequenceFlow_7</bpmn2:outgoing>
+            <bpmn2:script><![CDATA[import com.sap.gateway.ip.core.customdev.util.Message
+
+def Message processData(Message message) {
+    def messageLog = messageLogFactory.getMessageLog(message)
+    def headers = message.getHeaders()
+    
+    messageLog.setStringProperty("ProcessingStatus", "SUCCESS")
+    messageLog.setStringProperty("HTTP_Response_Code", headers.get("CamelHttpResponseCode") ?: "N/A")
+    
+    def responseBody = message.getBody(String.class)
+    if (responseBody) {
+        messageLog.addAttachmentAsString("HTTP_Response", responseBody, "application/json")
+    }
+    
+    return message
+}]]></bpmn2:script>
+        </bpmn2:scriptTask>
+        <bpmn2:endEvent id="EndEvent_2" name="End Success">
+            <bpmn2:incoming>SequenceFlow_7</bpmn2:incoming>
+        </bpmn2:endEvent>
+        <bpmn2:endEvent id="EndEvent_3" name="End Receiver">
+            <bpmn2:incoming>SequenceFlow_8</bpmn2:incoming>
+        </bpmn2:endEvent>
+        <bpmn2:sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_1" targetRef="ScriptTask_1"/>
+        <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="ScriptTask_1" targetRef="CallActivity_1"/>
+        <bpmn2:sequenceFlow id="SequenceFlow_3" sourceRef="CallActivity_1" targetRef="ScriptTask_2"/>
+        <bpmn2:sequenceFlow id="SequenceFlow_4" sourceRef="ScriptTask_2" targetRef="ScriptTask_3"/>
+        <bpmn2:sequenceFlow id="SequenceFlow_5" sourceRef="ScriptTask_3" targetRef="ServiceTask_5"/>
+        <bpmn2:sequenceFlow id="SequenceFlow_6" sourceRef="ServiceTask_5" targetRef="ScriptTask_4"/>
+        <bpmn2:sequenceFlow id="SequenceFlow_7" sourceRef="ScriptTask_4" targetRef="EndEvent_2"/>
+        <bpmn2:sequenceFlow id="SequenceFlow_8" sourceRef="ServiceTask_5" targetRef="EndEvent_3"/>
+        <bpmn2:subProcess id="SubProcess_1" name="Exception Subprocess" triggeredByEvent="true">
+            <bpmn2:startEvent id="StartEvent_Error" name="Error Start">
+                <bpmn2:outgoing>SequenceFlow_Error_1</bpmn2:outgoing>
+                <bpmn2:errorEventDefinition/>
+            </bpmn2:startEvent>
+            <bpmn2:scriptTask id="ScriptTask_Error" name="Log Error and Retry Logic" scriptFormat="groovy">
+                <bpmn2:incoming>SequenceFlow_Error_1</bpmn2:incoming>
+                <bpmn2:outgoing>SequenceFlow_Error_2</bpmn2:outgoing>
+                <bpmn2:script><![CDATA[import com.sap.gateway.ip.core.customdev.util.Message
+
+def Message processData(Message message) {
+    def messageLog = messageLogFactory.getMessageLog(message)
+    def properties = message.getProperties()
+    def headers = message.getHeaders()
+    
+    // Log error details
+    def errorMessage = properties.get("CamelExceptionCaught")
+    messageLog.setStringProperty("ProcessingStatus", "ERROR")
+    messageLog.setStringProperty("ErrorMessage", errorMessage?.toString() ?: "Unknown error")
+    
+    // Get retry policy from externalized parameter
+    def errorHandling = properties.get("ERROR_RESPONSE_HANDLING") ?: "retry_3"
+    messageLog.setStringProperty("ErrorHandlingPolicy", errorHandling)
+    
+    // Check if it's a transient HTTP error (5xx)
+    def httpCode = headers.get("CamelHttpResponseCode")
+    if (httpCode && httpCode.toString().startsWith("5")) {
+        messageLog.setStringProperty("ErrorType", "TRANSIENT_HTTP_ERROR")
+        messageLog.setStringProperty("RetryRecommended", "true")
+    } else {
+        messageLog.setStringProperty("ErrorType", "PERMANENT_ERROR")
+        messageLog.setStringProperty("RetryRecommended", "false")
+    }
+    
+    // Log full stack trace
+    if (errorMessage) {
+        messageLog.addAttachmentAsString("Error_Details", errorMessage.toString(), "text/plain")
+    }
+    
+    // Create error response
+    def errorResponse = """
+    {
+        "status": "ERROR",
+        "timestamp": "${new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")}",
+        "errorMessage": "${errorMessage?.toString()?.replaceAll('"', '\\"') ?: 'Processing failed'}",
+        "httpCode": "${httpCode ?: 'N/A'}"
+    }
+    """
+    
+    message.setBody(errorResponse)
+    
+    return message
+}]]></bpmn2:script>
+            </bpmn2:scriptTask>
+            <bpmn2:endEvent id="EndEvent_Error" name="Error End">
+                <bpmn2:incoming>SequenceFlow_Error_2</bpmn2:incoming>
+                <bpmn2:errorEventDefinition/>
+            </bpmn2:endEvent>
+            <bpmn2:sequenceFlow id="SequenceFlow_Error_1" sourceRef="StartEvent_Error" targetRef="ScriptTask_Error"/>
+            <bpmn2:sequenceFlow id="SequenceFlow_Error_2" sourceRef="ScriptTask_Error" targetRef="EndEvent_Error"/>
+        </bpmn2:subProcess>
+    </bpmn2:process>
+    <bpmn2:process id="Process_2" name="Receiver Process"/>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+            <bpmndi:BPMNShape id="Participant_1_gui" bpmnElement="Participant_1">
+                <dc:Bounds x="50" y="50" width="100" height="60"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="StartEvent_1_gui" bpmnElement="StartEvent_1">
+                <dc:Bounds x="200" y="72" width="36" height="36"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="ScriptTask_1_gui" bpmnElement="ScriptTask_1">
+                <dc:Bounds x="280" y="50" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="CallActivity_1_gui" bpmnElement="CallActivity_1">
+                <dc:Bounds x="420" y="50" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="ScriptTask_2_gui" bpmnElement="ScriptTask_2">
+                <dc:Bounds x="560" y="50" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="ScriptTask_3_gui" bpmnElement="ScriptTask_3">
+                <dc:Bounds x="700" y="50" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="ServiceTask_5_gui" bpmnElement="ServiceTask_5">
+                <dc:Bounds x="840" y="50" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="ScriptTask_4_gui" bpmnElement="ScriptTask_4">
+                <dc:Bounds x="980" y="50" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="EndEvent_2_gui" bpmnElement="EndEvent_2">
+                <dc:Bounds x="1120" y="72" width="36" height="36"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Participant_2_gui" bpmnElement="Participant_2">
+                <dc:Bounds x="840" y="200" width="100" height="60"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="EndEvent_3_gui" bpmnElement="EndEvent_3">
+                <dc:Bounds x="1000" y="212" width="36" height="36"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="SequenceFlow_1_gui" bpmnElement="SequenceFlow_1">
+                <di:waypoint x="236" y="90"/>
+                <di:waypoint x="280" y="90"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_2_gui" bpmnElement="SequenceFlow_2">
+                <di:waypoint x="380" y="90"/>
+                <di:waypoint x="420" y="90"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_3_gui" bpmnElement="SequenceFlow_3">
+                <di:waypoint x="520" y="90"/>
+                <di:waypoint x="560" y="90"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_4_gui" bpmnElement="SequenceFlow_4">
+                <di:waypoint x="660" y="90"/>
+                <di:waypoint x="700" y="90"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_5_gui" bpmnElement="SequenceFlow_5">
+                <di:waypoint x="800" y="90"/>
+                <di:waypoint x="840" y="90"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_6_gui" bpmnElement="SequenceFlow_6">
+                <di:waypoint x="940" y="90"/>
+                <di:waypoint x="980" y="90"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_7_gui" bpmnElement="SequenceFlow_7">
+                <di:waypoint x="1080" y="90"/>
+                <di:waypoint x="1120" y="90"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="MessageFlow_2_gui" bpmnElement="MessageFlow_2">
+                <di:waypoint x="890" y="130"/>
+                <di:waypoint x="890" y="200"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="SequenceFlow_8_gui" bpmnElement="SequenceFlow_8">
+                <di:waypoint x="940" y="230"/>
+                <di:waypoint x="1000" y="230"/>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

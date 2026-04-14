@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:ifl="http:///com.sap.ifl.model/Ifl.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1">
+    <bpmn2:collaboration id="Collaboration_1" name="Default Collaboration">
+        <bpmn2:extensionElements>
+            <ifl:property>
+                <key>namespaceMapping</key>
+                <value/>
+            </ifl:property>
+            <ifl:property>
+                <key>httpSessionHandling</key>
+                <value>None</value>
+            </ifl:property>
+            <ifl:property>
+                <key>accessControlMaxAge</key>
+                <value/>
+            </ifl:property>
+            <ifl:property>
+                <key>returnExceptionToSender</key>
+                <value>true</value>
+            </ifl:property>
+            <ifl:property>
+                <key>log</key>
+                <value>All events</value>
+            </ifl:property>
+            <ifl:property>
+                <key>corsEnabled</key>
+                <value>false</value>
+            </ifl:property>
+            <ifl:property>
+                <key>exposedHeaders</key>
+                <value/>
+            </ifl:property>
+            <ifl:property>
+                <key>componentVersion</key>
+                <value>1.2</value>
+            </ifl:property>
+            <ifl:property>
+                <key>allowedHeaderList</key>
+                <value/>
+            </ifl:property>
+            <ifl:property>
+                <key>ServerTrace</key>
+                <value>false</value>
+            </ifl:property>
+            <ifl:property>
+                <key>allowedOrigins</key>
+                <value/>
+            </ifl:property>
+            <ifl:property>
+                <key>accessControlAllowCredentials</key>
+                <value/>
+            </ifl:property>
+            <ifl:property>
+                <key>allowedHeaders</key>
+                <value/>
+            </ifl:property>
+            <ifl:property>
+                <key>allowedMethods</key>
+                <value/>
+            </ifl:property>
+            <ifl:property>
+                <key>cmdVariantUri</key>
+                <value>ctype::IFlowVariant/cname::IFlowConfiguration/version::1.2.3</value>
+            </ifl:property>
+        </bpmn2:extensionElements>
+        <bpmn2:participant id="Participant_SAP" ifl:type="EndpointSender" name="SAP">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>enableBasicAuthentication</key>
+                    <value>false</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>ifl:type</key>
+                    <value>EndpointSender</value>
+                </ifl:property>
+            </bpmn2:extensionElements>
+        </bpmn2:participant>
+        <bpmn2:participant id="Participant_Salesforce" ifl:type="EndpointRecevier" name="Salesforce">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>ifl:type</key>
+                    <value>EndpointRecevier</value>
+                </ifl:property>
+            </bpmn2:extensionElements>
+        </bpmn2:participant>
+        <bpmn2:participant id="Participant_Process_1" ifl:type="IntegrationProcess" name="Integration Process" processRef="Process_1">
+            <bpmn2:extensionElements/>
+        </bpmn2:participant>
+        <bpmn2:messageFlow id="MessageFlow_In" name="HTTP" sourceRef="Participant_SAP" targetRef="StartEvent_1">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>ComponentType</key>
+                    <value>HTTP</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>Description</key>
+                    <value>Receives XML from SAP via HTTP POST</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>maximumBodySize</key>
+                    <value>40</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>maximumAttachmentSize</key>
+                    <value>100</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>ComponentNS</key>
+                    <value>sap</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>componentVersion</key>
+                    <value>1.4</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>urlPath</key>
+                    <value>/sap-to-salesforce</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>Name</key>
+                    <value>HTTP</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>TransportProtocolVersion</key>
+                    <value>1.4.2</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>ComponentSWCVName</key>
+                    <value>external</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>system</key>
+                    <value>Sender</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>xsrfProtection</key>
+                    <value>0</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>ServerTrace</key>
+                    <value>false</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>allowedMethods</key>
+                    <value>POST</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>TransportProtocol</key>
+                    <value>HTTP</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>MessageProtocol</key>
+                    <value>None</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>MessageProtocolVersion</key>
+                    <value>1.4.2</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>ComponentSWCVId</key>
+                    <value>1.4.2</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>direction</key>
+                    <value>Sender</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>ComponentName</key>
+                    <value>sap:HTTP</value>
+                </ifl:property>
+            </bpmn2:extensionElements>
+        </bpmn2:messageFlow>
+        <bpmn2:messageFlow id="MessageFlow_Out" name="HTTP" sourceRef="EndEvent_1" targetRef="Participant_Salesforce">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>ComponentType</key>
+                    <value>HTTP</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>Description</key>
+                    <value>Sends data to Salesforce REST API</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>timeout</key>
+                    <value>60000</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>httpMethod</key>
+                    <value>POST</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>ComponentNS</key>
+                    <value>sap</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>componentVersion</key>
+                    <value>1.4</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>urlPath</key>
+                    <value>{{SalesforceEndpoint}}</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>Name</key>
+                    <value>HTTP</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>TransportProtocolVersion</key>
+                    <value>1.4.2</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>ComponentSWCVName</key>
+                    <value>external</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>system</key>
+                    <value>Receiver</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>authenticationMethod</key>
+                    <value>OAuth2ClientCredentials</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>credentialName</key>
+                    <value>{{SalesforceOAuthCredential}}</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>TransportProtocol</key>
+                    <value>HTTP</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>MessageProtocol</key>
+                    <value>None</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>MessageProtocolVersion</key>
+                    <value>1.4.2</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>ComponentSWCVId</key>
+                    <value>1.4.2</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>direction</key>
+                    <value>Receiver</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>ComponentName</key>
+                    <value>sap:HTTP</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>contentType</key>
+                    <value>application/json</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>requestHeaders</key>
+                    <value>Accept:application/json</value>
+                </ifl:property>
+            </bpmn2:extensionElements>
+        </bpmn2:messageFlow>
+    </bpmn2:collaboration>
+    <bpmn2:process id="Process_1" name="Integration Process">
+        <bpmn2:extensionElements>
+            <ifl:property>
+                <key>transactionTimeout</key>
+                <value>300</value>
+            </ifl:property>
+            <ifl:property>
+                <key>componentVersion</key>
+                <value>1.2</value>
+            </ifl:property>
+            <ifl:property>
+                <key>cmdVariantUri</key>
+                <value>ctype::FlowElementVariant/cname::Aggregator/version::1.0.1</value>
+            </ifl:property>
+            <ifl:property>
+                <key>transactionalHandling</key>
+                <value>Required</value>
+            </ifl:property>
+        </bpmn2:extensionElements>
+        <bpmn2:startEvent id="StartEvent_1" name="Start">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>componentVersion</key>
+                    <value>1.0</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>cmdVariantUri</key>
+                    <value>ctype::FlowstepVariant/cname::MessageStartEvent/version::1.0</value>
+                </ifl:property>
+            </bpmn2:extensionElements>
+            <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
+            <bpmn2:messageEventDefinition/>
+        </bpmn2:startEvent>
+        <bpmn2:sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_1" targetRef="ScriptTask_LogStart"/>
+        <bpmn2:scriptTask id="ScriptTask_LogStart" name="Log Start">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>componentVersion</key>
+                    <value>1.2</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>activityType</key>
+                    <value>Script</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>cmdVariantUri</key>
+                    <value>ctype::FlowstepVariant/cname::GroovyScript/version::1.2.1</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>subActivityType</key>
+                    <value>GroovyScript</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>script</key>
+                    <value>LogStart.groovy</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>scriptFunction</key>
+                    <value/>
+                </ifl:property>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
+            <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
+        </bpmn2:scriptTask>
+        <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="ScriptTask_LogStart" targetRef="ScriptTask_ValidateXML"/>
+        <bpmn2:scriptTask id="ScriptTask_ValidateXML" name="Validate and Transform XML">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>componentVersion</key>
+                    <value>1.2</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>activityType</key>
+                    <value>Script</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>cmdVariantUri</key>
+                    <value>ctype::FlowstepVariant/cname::GroovyScript/version::1.2.1</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>subActivityType</key>
+                    <value>GroovyScript</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>script</key>
+                    <value>ValidateAndTransformXML.groovy</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>scriptFunction</key>
+                    <value/>
+                </ifl:property>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
+            <bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing>
+        </bpmn2:scriptTask>
+        <bpmn2:sequenceFlow id="SequenceFlow_3" sourceRef="ScriptTask_ValidateXML" targetRef="ScriptTask_ConvertToJSON"/>
+        <bpmn2:scriptTask id="ScriptTask_ConvertToJSON" name="Convert XML to JSON">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>componentVersion</key>
+                    <value>1.2</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>activityType</key>
+                    <value>Script</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>cmdVariantUri</key>
+                    <value>ctype::FlowstepVariant/cname::GroovyScript/version::1.2.1</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>subActivityType</key>
+                    <value>GroovyScript</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>script</key>
+                    <value>ConvertXMLtoJSON.groovy</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>scriptFunction</key>
+                    <value/>
+                </ifl:property>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>SequenceFlow_3</bpmn2:incoming>
+            <bpmn2:outgoing>SequenceFlow_4</bpmn2:outgoing>
+        </bpmn2:scriptTask>
+        <bpmn2:sequenceFlow id="SequenceFlow_4" sourceRef="ScriptTask_ConvertToJSON" targetRef="ScriptTask_LogBeforeSend"/>
+        <bpmn2:scriptTask id="ScriptTask_LogBeforeSend" name="Log Before Send">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>componentVersion</key>
+                    <value>1.2</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>activityType</key>
+                    <value>Script</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>cmdVariantUri</key>
+                    <value>ctype::FlowstepVariant/cname::GroovyScript/version::1.2.1</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>subActivityType</key>
+                    <value>GroovyScript</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>script</key>
+                    <value>LogBeforeSend.groovy</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>scriptFunction</key>
+                    <value/>
+                </ifl:property>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>SequenceFlow_4</bpmn2:incoming>
+            <bpmn2:outgoing>SequenceFlow_5</bpmn2:outgoing>
+        </bpmn2:scriptTask>
+        <bpmn2:sequenceFlow id="SequenceFlow_5" sourceRef="ScriptTask_LogBeforeSend" targetRef="EndEvent_1"/>
+        <bpmn2:endEvent id="EndEvent_1" name="End">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>componentVersion</key>
+                    <value>1.1</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>cmdVariantUri</key>
+                    <value>ctype::FlowstepVariant/cname::MessageEndEvent/version::1.1.0</value>
+                </ifl:property>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>SequenceFlow_5</bpmn2:incoming>
+            <bpmn2:messageEventDefinition/>
+        </bpmn2:endEvent>
+        <bpmn2:subProcess id="SubProcess_Exception" name="Exception Subprocess" triggeredByEvent="true">
+            <bpmn2:startEvent id="StartEvent_Exception" name="Error Start">
+                <bpmn2:extensionElements>
+                    <ifl:property>
+                        <key>componentVersion</key>
+                        <value>1.0</value>
+                    </ifl:property>
+                </bpmn2:extensionElements>
+                <bpmn2:outgoing>SequenceFlow_Exception_1</bpmn2:outgoing>
+                <bpmn2:errorEventDefinition/>
+            </bpmn2:startEvent>
+            <bpmn2:sequenceFlow id="SequenceFlow_Exception_1" sourceRef="StartEvent_Exception" targetRef="ScriptTask_LogError"/>
+            <bpmn2:scriptTask id="ScriptTask_LogError" name="Log Error">
+                <bpmn2:extensionElements>
+                    <ifl:property>
+                        <key>componentVersion</key>
+                        <value>1.2</value>
+                    </ifl:property>
+                    <ifl:property>
+                        <key>activityType</key>
+                        <value>Script</value>
+                    </ifl:property>
+                    <ifl:property>
+                        <key>cmdVariantUri</key>
+                        <value>ctype::FlowstepVariant/cname::GroovyScript/version::1.2.1</value>
+                    </ifl:property>
+                    <ifl:property>
+                        <key>subActivityType</key>
+                        <value>GroovyScript</value>
+                    </ifl:property>
+                    <ifl:property>
+                        <key>script</key>
+                        <value>LogError.groovy</value>
+                    </ifl:property>
+                </bpmn2:extensionElements>
+                <bpmn2:incoming>SequenceFlow_Exception_1</bpmn2:incoming>
+                <bpmn2:outgoing>SequenceFlow_Exception_2</bpmn2:outgoing>
+            </bpmn2:scriptTask>
+            <bpmn2:sequenceFlow id="SequenceFlow_Exception_2" sourceRef="ScriptTask_LogError" targetRef="EndEvent_Exception"/>
+            <bpmn2:endEvent id="EndEvent_Exception" name="Error End">
+                <bpmn2:extensionElements>
+                    <ifl:property>
+                        <key>componentVersion</key>
+                        <value>1.1</value>
+                    </ifl:property>
+                </bpmn2:extensionElements>
+                <bpmn2:incoming>SequenceFlow_Exception_2</bpmn2:incoming>
+                <bpmn2:errorEventDefinition/>
+            </bpmn2:endEvent>
+        </bpmn2:subProcess>
+    </bpmn2:process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_1" name="Default Collaboration Diagram">
+        <bpmndi:BPMNPlane bpmnElement="Collaboration_1" id="BPMNPlane_1">
+            <bpmndi:BPMNShape bpmnElement="Participant_SAP" id="BPMNShape_Participant_SAP">
+                <dc:Bounds height="140" width="100" x="40" y="40"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="Participant_Process_1" id="BPMNShape_Participant_Process_1">
+                <dc:Bounds height="400" width="1200" x="200" y="40"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="StartEvent_1" id="BPMNShape_StartEvent_1">
+                <dc:Bounds height="32" width="32" x="250" y="150"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="ScriptTask_LogStart" id="BPMNShape_ScriptTask_LogStart">
+                <dc:Bounds height="60" width="100" x="350" y="136"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="ScriptTask_ValidateXML" id="BPMNShape_ScriptTask_ValidateXML">
+                <dc:Bounds height="60" width="100" x="520" y="136"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="ScriptTask_ConvertToJSON" id="BPMNShape_ScriptTask_ConvertToJSON">
+                <dc:Bounds height="60" width="100" x="690" y="136"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="ScriptTask_LogBeforeSend" id="BPMNShape_ScriptTask_LogBeforeSend">
+                <dc:Bounds height="60" width="100" x="860" y="136"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="EndEvent_1" id="BPMNShape_EndEvent_1">
+                <dc:Bounds height="32" width="32" x="1030" y="150"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="Participant_Salesforce" id="BPMNShape_Participant_Salesforce">
+                <dc:Bounds height="140" width="100" x="1460" y="40"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="SubProcess_Exception" id="BPMNShape_SubProcess_Exception" isExpanded="true">
+                <dc:Bounds height="150" width="600" x="250" y="280"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="StartEvent_Exception" id="BPMNShape_StartEvent_Exception">
+                <dc:Bounds height="32" width="32" x="300" y="339"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="ScriptTask_LogError" id="BPMNShape_ScriptTask_LogError">
+                <dc:Bounds height="60" width="100" x="420" y="325"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="EndEvent_Exception" id="BPMNShape_EndEvent_Exception">
+                <dc:Bounds height="32" width="32" x="620" y="339"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge bpmnElement="MessageFlow_In" id="BPMNEdge_MessageFlow_In">
+                <di:waypoint x="140" xsi:type="dc:Point" y="110"/>
+                <di:waypoint x="250" xsi:type="dc:Point" y="166"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="MessageFlow_Out" id="BPMNEdge_MessageFlow_Out">
+                <di:waypoint x="1046" xsi:type="dc:Point" y="166"/>
+                <di:waypoint x="1460" xsi:type="dc:Point" y="110"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="SequenceFlow_1" id="BPMNEdge_SequenceFlow_1">
+                <di:waypoint x="282" xsi:type="dc:Point" y="166"/>
+                <di:waypoint x="350" xsi:type="dc:Point" y="166"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="SequenceFlow_2" id="BPMNEdge_SequenceFlow_2">
+                <di:waypoint x="450" xsi:type="dc:Point" y="166"/>
+                <di:waypoint x="520" xsi:type="dc:Point" y="166"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="SequenceFlow_3" id="BPMNEdge_SequenceFlow_3">
+                <di:waypoint x="620" xsi:type="dc:Point" y="166"/>
+                <di:waypoint x="690" xsi:type="dc:Point" y="166"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="SequenceFlow_4" id="BPMNEdge_SequenceFlow_4">
+                <di:waypoint x="790" xsi:type="dc:Point" y="166"/>
+                <di:waypoint x="860" xsi:type="dc:Point" y="166"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="SequenceFlow_5" id="BPMNEdge_SequenceFlow_5">
+                <di:waypoint x="960" xsi:type="dc:Point" y="166"/>
+                <di:waypoint x="1030" xsi:type="dc:Point" y="166"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="SequenceFlow_Exception_1" id="BPMNEdge_SequenceFlow_Exception_1">
+                <di:waypoint x="332" xsi:type="dc:Point" y="355"/>
+                <di:waypoint x="420" xsi:type="dc:Point" y="355"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="SequenceFlow_Exception_2" id="BPMNEdge_SequenceFlow_Exception_2">
+                <di:waypoint x="520" xsi:type="dc:Point" y="355"/>
+                <di:waypoint x="620" xsi:type="dc:Point" y="355"/>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPM

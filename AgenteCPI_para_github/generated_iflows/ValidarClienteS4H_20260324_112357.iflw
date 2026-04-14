@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:ifl="http:///com.sap.ifl.model/Ifl.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1">
+    <bpmn2:collaboration id="Collaboration_1" name="Default Collaboration">
+        <bpmn2:extensionElements>
+            <ifl:property>
+                <key>namespaceMapping</key>
+                <value>xmlns:sap=http://sap.com/xi/SAP;xmlns:s4=http://sap.com/xi/SAP/S4HANA</value>
+            </ifl:property>
+            <ifl:property>
+                <key>httpSessionHandling</key>
+                <value>None</value>
+            </ifl:property>
+            <ifl:property>
+                <key>accessControlMaxAge</key>
+                <value/>
+            </ifl:property>
+            <ifl:property>
+                <key>returnExceptionToSender</key>
+                <value>true</value>
+            </ifl:property>
+            <ifl:property>
+                <key>log</key>
+                <value>All events</value>
+            </ifl:property>
+            <ifl:property>
+                <key>corsEnabled</key>
+                <value>false</value>
+            </ifl:property>
+            <ifl:property>
+                <key>exposedHeaders</key>
+                <value/>
+            </ifl:property>
+            <ifl:property>
+                <key>componentVersion</key>
+                <value>1.2</value>
+            </ifl:property>
+            <ifl:property>
+                <key>allowedHeaderList</key>
+                <value/>
+            </ifl:property>
+            <ifl:property>
+                <key>ServerTrace</key>
+                <value>false</value>
+            </ifl:property>
+            <ifl:property>
+                <key>allowedOrigins</key>
+                <value/>
+            </ifl:property>
+            <ifl:property>
+                <key>accessControlAllowCredentials</key>
+                <value/>
+            </ifl:property>
+            <ifl:property>
+                <key>allowedHeaders</key>
+                <value/>
+            </ifl:property>
+            <ifl:property>
+                <key>allowedMethods</key>
+                <value/>
+            </ifl:property>
+            <ifl:property>
+                <key>cmdVariantUri</key>
+                <value>ctype::IFlowVariant/cname::IFlowConfiguration/version::1.2.3</value>
+            </ifl:property>
+        </bpmn2:extensionElements>
+        <bpmn2:participant id="Participant_Sender" ifl:type="EndpointSender" name="Sender">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>enableBasicAuthentication</key>
+                    <value>false</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>ifl:type</key>
+                    <value>EndpointSender</value>
+                </ifl:property>
+            </bpmn2:extensionElements>
+        </bpmn2:participant>
+        <bpmn2:participant id="Participant_S4HANA" ifl:type="EndpointRecevier" name="S4HANA">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>ifl:type</key>
+                    <value>EndpointRecevier</value>
+                </ifl:property>
+            </bpmn2:extensionElements>
+        </bpmn2:participant>
+        <bpmn2:participant id="Participant_Process" ifl:type="IntegrationProcess" name="Integration Process" processRef="Process_ValidarCliente">
+            <bpmn2:extensionElements/>
+        </bpmn2:participant>
+        <bpmn2:messageFlow id="MessageFlow_HTTP_In" name="HTTPS" sourceRef="Participant_Sender" targetRef="StartEvent_HTTP">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>Description</key>
+                    <value>Recibe pedido HTTP</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>ComponentNS</key>
+                    <value>sap</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>componentVersion</key>
+                    <value>1.2</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>httpMethod</key>
+                    <value>POST</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>MessageProtocol</key>
+                    <value>HTTPS</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>ComponentType</key>
+                    <value>HTTPS</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>address</key>
+                    <value>/ValidarClienteS4H</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>authenticationType</key>
+                    <value>None</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>authorization</key>
+                    <value>User Role</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>userRole</key>
+                    <value>ESBMessaging.send</value>
+                </ifl:property>
+            </bpmn2:extensionElements>
+        </bpmn2:messageFlow>
+        <bpmn2:messageFlow id="MessageFlow_SOAP_Out" name="SOAP" sourceRef="CallActivity_SOAP" targetRef="Participant_S4HANA">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>Description</key>
+                    <value>Llamada SOAP a S4HANA para validar cliente</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>ComponentNS</key>
+                    <value>sap</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>componentVersion</key>
+                    <value>1.2</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>MessageProtocol</key>
+                    <value>SOAP 1.1</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>ComponentType</key>
+                    <value>SOAP</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>address</key>
+                    <value>{{S4HANA_Endpoint}}</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>proxyType</key>
+                    <value>default</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>authentication</key>
+                    <value>Basic</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>credentialName</key>
+                    <value>{{S4HANA_Credential}}</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>soapAction</key>
+                    <value>{{SOAP_Action}}</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>timeout</key>
+                    <value>60000</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>wsdlURL</key>
+                    <value>{{WSDL_URL}}</value>
+                </ifl:property>
+            </bpmn2:extensionElements>
+        </bpmn2:messageFlow>
+    </bpmn2:collaboration>
+    <bpmn2:process id="Process_ValidarCliente" name="Integration Process" isExecutable="true">
+        <bpmn2:extensionElements>
+            <ifl:property>
+                <key>transactionTimeout</key>
+                <value>300</value>
+            </ifl:property>
+            <ifl:property>
+                <key>componentVersion</key>
+                <value>1.2</value>
+            </ifl:property>
+            <ifl:property>
+                <key>cmdVariantUri</key>
+                <value>ctype::FlowstepVariant/cname::Integrationprocess/version::1.2.1</value>
+            </ifl:property>
+            <ifl:property>
+                <key>transactionalHandling</key>
+                <value>Not Required</value>
+            </ifl:property>
+        </bpmn2:extensionElements>
+        <bpmn2:startEvent id="StartEvent_HTTP" name="Start HTTP">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>cmdVariantUri</key>
+                    <value>ctype::FlowstepVariant/cname::MessageStartEvent/version::1.0</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>componentVersion</key>
+                    <value>1.0</value>
+                </ifl:property>
+            </bpmn2:extensionElements>
+            <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
+            <bpmn2:messageEventDefinition/>
+        </bpmn2:startEvent>
+        <bpmn2:sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_HTTP" targetRef="ScriptTask_LogRequest"/>
+        <bpmn2:scriptTask id="ScriptTask_LogRequest" name="Log Request">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>componentVersion</key>
+                    <value>1.2</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>activityType</key>
+                    <value>Script</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>cmdVariantUri</key>
+                    <value>ctype::FlowstepVariant/cname::GroovyScript/version::1.2.1</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>scriptFunction</key>
+                    <value/>
+                </ifl:property>
+                <ifl:property>
+                    <key>script</key>
+                    <value>LogRequest.groovy</value>
+                </ifl:property>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
+            <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
+        </bpmn2:scriptTask>
+        <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="ScriptTask_LogRequest" targetRef="CallActivity_SOAP"/>
+        <bpmn2:callActivity id="CallActivity_SOAP" name="Validar Cliente SOAP">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>bodyType</key>
+                    <value>expression</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>componentVersion</key>
+                    <value>1.2</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>activityType</key>
+                    <value>ExternalCall</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>cmdVariantUri</key>
+                    <value>ctype::FlowstepVariant/cname::CallActivity/version::1.2.1</value>
+                </ifl:property>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
+            <bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing>
+        </bpmn2:callActivity>
+        <bpmn2:sequenceFlow id="SequenceFlow_3" sourceRef="CallActivity_SOAP" targetRef="ScriptTask_ProcessResponse"/>
+        <bpmn2:scriptTask id="ScriptTask_ProcessResponse" name="Process Response">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>componentVersion</key>
+                    <value>1.2</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>activityType</key>
+                    <value>Script</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>cmdVariantUri</key>
+                    <value>ctype::FlowstepVariant/cname::GroovyScript/version::1.2.1</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>scriptFunction</key>
+                    <value/>
+                </ifl:property>
+                <ifl:property>
+                    <key>script</key>
+                    <value>ProcessResponse.groovy</value>
+                </ifl:property>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>SequenceFlow_3</bpmn2:incoming>
+            <bpmn2:outgoing>SequenceFlow_4</bpmn2:outgoing>
+        </bpmn2:scriptTask>
+        <bpmn2:sequenceFlow id="SequenceFlow_4" sourceRef="ScriptTask_ProcessResponse" targetRef="EndEvent_Success"/>
+        <bpmn2:endEvent id="EndEvent_Success" name="End Success">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>componentVersion</key>
+                    <value>1.1</value>
+                </ifl:property>
+                <ifl:property>
+                    <key>cmdVariantUri</key>
+                    <value>ctype::FlowstepVariant/cname::MessageEndEvent/version::1.1.0</value>
+                </ifl:property>
+            </bpmn2:extensionElements>
+            <bpmn2:incoming>SequenceFlow_4</bpmn2:incoming>
+            <bpmn2:messageEventDefinition/>
+        </bpmn2:endEvent>
+        <bpmn2:subProcess id="SubProcess_Exception" name="Exception Subprocess" triggeredByEvent="true">
+            <bpmn2:extensionElements>
+                <ifl:property>
+                    <key>cmdVariantUri</key>
+                    <value>ctype::FlowstepVariant/cname::exceptionSubprocess/version::1.0.0</value>
+                </ifl:property>
+            </bpmn2:extensionElements>
+            <bpmn2:startEvent id="StartEvent_Exception" name="Error Start">
+                <bpmn2:extensionElements>
+                    <ifl:property>
+                        <key>componentVersion</key>
+                        <value>1.0</value>
+                    </ifl:property>
+                    <ifl:property>
+                        <key>cmdVariantUri</key>
+                        <value>ctype::FlowstepVariant/cname::ErrorStartEvent/version::1.0</value>
+                    </ifl:property>
+                </bpmn2:extensionElements>
+                <bpmn2:outgoing>SequenceFlow_Error_1</bpmn2:outgoing>
+                <bpmn2:errorEventDefinition/>
+            </bpmn2:startEvent>
+            <bpmn2:sequenceFlow id="SequenceFlow_Error_1" sourceRef="StartEvent_Exception" targetRef="ScriptTask_ErrorHandler"/>
+            <bpmn2:scriptTask id="ScriptTask_ErrorHandler" name="Error Handler">
+                <bpmn2:extensionElements>
+                    <ifl:property>
+                        <key>componentVersion</key>
+                        <value>1.2</value>
+                    </ifl:property>
+                    <ifl:property>
+                        <key>activityType</key>
+                        <value>Script</value>
+                    </ifl:property>
+                    <ifl:property>
+                        <key>cmdVariantUri</key>
+                        <value>ctype::FlowstepVariant/cname::GroovyScript/version::1.2.1</value>
+                    </ifl:property>
+                    <ifl:property>
+                        <key>scriptFunction</key>
+                        <value/>
+                    </ifl:property>
+                    <ifl:property>
+                        <key>script</key>
+                        <value>ErrorHandler.groovy</value>
+                    </ifl:property>
+                </bpmn2:extensionElements>
+                <bpmn2:incoming>SequenceFlow_Error_1</bpmn2:incoming>
+                <bpmn2:outgoing>SequenceFlow_Error_2</bpmn2:outgoing>
+            </bpmn2:scriptTask>
+            <bpmn2:sequenceFlow id="SequenceFlow_Error_2" sourceRef="ScriptTask_ErrorHandler" targetRef="EndEvent_Error"/>
+            <bpmn2:endEvent id="EndEvent_Error" name="Error End">
+                <bpmn2:extensionElements>
+                    <ifl:property>
+                        <key>componentVersion</key>
+                        <value>1.1</value>
+                    </ifl:property>
+                    <ifl:property>
+                        <key>cmdVariantUri</key>
+                        <value>ctype::FlowstepVariant/cname::MessageEndEvent/version::1.1.0</value>
+                    </ifl:property>
+                </bpmn2:extensionElements>
+                <bpmn2:incoming>SequenceFlow_Error_2</bpmn2:incoming>
+                <bpmn2:messageEventDefinition/>
+            </bpmn2:endEvent>
+        </bpmn2:subProcess>
+    </bpmn2:process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_1" name="Default Collaboration Diagram">
+        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+            <bpmndi:BPMNShape id="BPMNShape_Participant_Sender" bpmnElement="Participant_Sender">
+                <dc:Bounds x="100" y="100" width="140" height="60"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="BPMNShape_Participant_S4HANA" bpmnElement="Participant_S4HANA">
+                <dc:Bounds x="900" y="100" width="140" height="60"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="BPMNShape_Participant_Process" bpmnElement="Participant_Process" isHorizontal="true">
+                <dc:Bounds x="100" y="300" width="940" height="400"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="BPMNShape_StartEvent_HTTP" bpmnElement="StartEvent_HTTP">
+                <dc:Bounds x="152" y="382" width="36" height="36"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="BPMNShape_ScriptTask_LogRequest" bpmnElement="ScriptTask_LogRequest">
+                <dc:Bounds x="250" y="360" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="BPMNShape_CallActivity_SOAP" bpmnElement="CallActivity_SOAP">
+                <dc:Bounds x="420" y="360" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="BPMNShape_ScriptTask_ProcessResponse" bpmnElement="ScriptTask_ProcessResponse">
+                <dc:Bounds x="590" y="360" width="100" height="80"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="BPMNShape_EndEvent_Success" bpmnElement="EndEvent_Success">
+                <dc:Bounds x="752" y="382" width="36" height="36"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="BPMNShape_SubProcess_Exception" bpmnElement="SubProcess_Exception" isExpanded="true">
+                <dc:Bounds x="150" y="530" width="640" height="140"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1">
+                <di:waypoint x="188" y="400"/>
+                <di:waypoint x="250" y="400"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2">
+                <di:waypoint x="350" y="400"/>
+                <di:waypoint x="420" y="400"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="SequenceFlow_3">
+                <di:waypoint x="520" y="400"/>
+                <di:waypoint x="590" y="400"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_4" bpmnElement="SequenceFlow_4">
+                <di:waypoint x="690" y="400"/>
+                <di:waypoint x="752" y="400"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="BPMNEdge_MessageFlow_HTTP_In" bpmnElement="MessageFlow_HTTP_In">
+                <di:waypoint x="170" y="160"/>
+                <di:waypoint x="170" y="382"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="BPMNEdge_MessageFlow_SOAP_Out" bpmnElement="MessageFlow_SOAP_Out">
+                <di:waypoint x="470" y="360"/>
+                <di:waypoint x="970" y="160"/>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</bpmn2:definitions>
